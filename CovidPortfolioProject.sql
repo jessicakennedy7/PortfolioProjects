@@ -3,18 +3,15 @@ FROM CovidPortfolioProject..CovidDeaths
 WHERE continent is not null
 ORDER BY 3,4
 
---SELECT * FROM CovidPortfolioProject..CovidVaccinations
---ORDER BY 3,4
-
---Select data to use for project
+--select data to use for project
 
 SELECT Location, date, total_cases, new_cases, total_deaths, population
 FROM CovidPortfolioProject..CovidDeaths
 WHERE continent is not null
 ORDER BY 1,2
 
---Review Total Cases vs Total Deaths
---Shows likelihood of dying if Covid is contracted in a particular country
+--review total cases vs total deaths
+--shows likelihood of dying if covid is contracted in a particular country
 
 SELECT Location, date, total_cases,total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
 FROM CovidPortfolioProject..CovidDeaths
@@ -23,8 +20,8 @@ WHERE continent is not null
 ORDER BY 1,2
 
 
---Reviewing Total Cases vs Population
---Shows what percentage of population got Covid
+--reviewing total cases vs population
+--shows what percentage of population got covid
 
 SELECT Location, date, population, total_cases, (total_cases/population)*100 as PercentPopulationInfected
 FROM CovidPortfolioProject..CovidDeaths
@@ -33,7 +30,7 @@ WHERE continent is not null
 ORDER BY 1,2
 
 
---Reviewing Countries with highest infection rate compared to population
+--reviewing countries with highest infection rate compared to population
 
 SELECT Location, population, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercentPopulationInfected
 FROM CovidPortfolioProject..CovidDeaths
@@ -43,7 +40,7 @@ GROUP BY location, population
 ORDER BY PercentPopulationInfected desc
 
 
---Showing countries with highest death count per population
+--shows countries with highest death count per population
 
 SELECT location, MAX(cast(total_deaths as int)) as TotalDeathCount
 FROM CovidPortfolioProject..CovidDeaths
@@ -52,10 +49,12 @@ WHERE continent is not null
 GROUP BY location, population
 ORDER BY TotalDeathCount desc
 
---Breaking down by continent
 
 
---Showing continents with the highest death count per population
+--break down by continent
+
+
+--show continents with the highest death count per population
 
 SELECT continent, MAX(cast(total_deaths as int)) as TotalDeathCount
 FROM CovidPortfolioProject..CovidDeaths
@@ -65,7 +64,7 @@ GROUP BY continent
 ORDER BY TotalDeathCount desc
 
 
---Global Numbers
+--global numbers
 
 SELECT date as Date, SUM(new_cases) as TotalCases, SUM(cast(new_deaths as int)) as TotalDeaths, SUM(cast(new_deaths as int))/SUM(new_cases)*100 as DeathPercentage
 FROM CovidPortfolioProject..CovidDeaths
@@ -75,7 +74,7 @@ ORDER BY 1,2
 
 
 
--- Total population vs vaccinations
+-- total population vs vaccinations
 
 SELECT dea.continent, dea.location, dea.date, dea.population, 
 vax.new_vaccinations, SUM(cast(vax.new_vaccinations as bigint)) 
