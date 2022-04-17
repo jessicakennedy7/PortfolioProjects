@@ -1,0 +1,61 @@
+Sub SaveCopyAs()
+'saves a copy of the raw report before saving as pdf
+
+Dim myPath As String
+    myPath = "S:\[redacted]\Custom Invoices\Raw\"
+    With ActiveWorkbook
+
+    ActiveWorkbook.Sheets.Copy 'creates new workbook without macros"
+    'The New workbook copy is now the Active workbook
+    ActiveWorkbook.SaveAs Filename:=myPath & ThisWorkbook.Sheets("Invoice Details").Range("D12").Value & ".xlsm", FileFormat:=52
+    End With
+End Sub
+
+Sub SavePDF()
+' SavePDF Macro
+ChDir "S:\[redacted]\Custom Invoices\"
+ThisWorkbook.Sheets("Custom Invoice").ExportAsFixedFormat _
+    Type:=xlTypePDF, _
+    Filename:="S:\[redacted]\Custom Invoices\" & ThisWorkbook.Sheets("Invoice Details").Range("D12").Value, _
+    Quality:=xlQualityStandard, _
+    IncludeDocProperties:=True, _
+    IgnorePrintAreas:=False, _
+    OpenAfterPublish:=True
+    
+End Sub
+
+Sub SendEmail_CI1()
+
+'Create Instance of Outlook
+ On Error Resume Next
+    Set OutlookApp = GetObject(Class:="Outlook.Application") 'handles if outlook is already open
+ Err.Clear
+    If OutlookApp Is Nothing Then Set OutlookApp = CreateObject(Class:="Outlook.Application") 'if not, open outlook
+    
+    If Err.Number = 429 Then
+        MsgBox "Outlook could not be found, aborting.", 16, "Outlook Not Found"
+    End If
+On Error GoTo 0
+
+'Create new email
+    Set OutlookMessage = OutlookApp.CreateItem(0)
+
+'Create Outlook email with attachment
+On Error Resume Next
+    With OutlookMessage
+    .To = ThisWorkbook.Sheets("Control").Range("K20").Value & "; " & ThisWorkbook.Sheets("Control").Range("K21").Value & "; " & ThisWorkbook.Sheets("Control").Range("K22").Value & "; " & ThisWorkbook.Sheets("Control").Range("K23").Value & "; " & ThisWorkbook.Sheets("Control").Range("K24").Value
+    .BCC = "jessica.kennedy@[domain].com"
+    .Subject = "Custom Invoice, Government Account" & ThisWorkbook.Sheets("Control").Range("E23").Value
+    .Body = "Hello," & vbNewLine & vbNewLine & "Please see the attached custom invoice. The details are below for your review." & vbNewLine & vbNewLine & ThisWorkbook.Sheets("Control").Range("J6").Value & vbNewLine & ThisWorkbook.Sheets("Control").Range("J7").Value & vbNewLine & ThisWorkbook.Sheets("Control").Range("J8").Value & vbNewLine & ThisWorkbook.Sheets("Control").Range("J9").Value & vbNewLine & ThisWorkbook.Sheets("Control").Range("J10").Value & vbNewLine & ThisWorkbook.Sheets("Control").Range("J11").Value & vbNewLine & ThisWorkbook.Sheets("Control").Range("J12").Value & vbNewLine & vbNewLine & "Thank you!"
+    .Attachments.Add "S:\[redacted]\Custom Invoices\" & ThisWorkbook.Sheets("Invoice Details").Range("D12").Value & ".pdf"
+    .Display
+    End With
+On Error GoTo 0
+
+End Sub
+
+Private Sub CommandButton1_Click()
+Call SaveCopyAs
+Call SavePDF
+Call SendEmail_CI1
+End Sub
